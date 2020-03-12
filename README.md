@@ -5,6 +5,13 @@
 
 ## Usage
 
+#### func  NoBackoff
+
+```go
+func NoBackoff() time.Duration
+```
+NoBackoff defines no backoff strategy
+
 #### type Errors
 
 ```go
@@ -25,6 +32,10 @@ func (errs Errors) Error() string
 type Retryer struct {
 	// Attempts defines the number of retry attempts
 	Attempts uint
+
+	// Backoff defines a backoff function that returns `time.Duration`
+	// This is applied on subsequent attempts.
+	Backoff func() time.Duration
 }
 ```
 
