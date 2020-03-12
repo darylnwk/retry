@@ -5,10 +5,24 @@
 
 ## Usage
 
+#### func  ConstantBackoff
+
+```go
+func ConstantBackoff(_ uint, delay time.Duration) time.Duration
+```
+ConstantBackoff defines constant backoff strategy
+
+#### func  ExponentialBackoff
+
+```go
+func ExponentialBackoff(n uint, delay time.Duration) time.Duration
+```
+ExponentialBackoff defines exponential backoff strategy
+
 #### func  NoBackoff
 
 ```go
-func NoBackoff() time.Duration
+func NoBackoff(_ uint, _ time.Duration) time.Duration
 ```
 NoBackoff defines no backoff strategy
 
@@ -35,7 +49,10 @@ type Retryer struct {
 
 	// Backoff defines a backoff function that returns `time.Duration`
 	// This is applied on subsequent attempts.
-	Backoff func() time.Duration
+	Backoff func(n uint, delay time.Duration) time.Duration
+
+	// Delay defines duration to delay
+	Delay time.Duration
 }
 ```
 
