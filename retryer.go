@@ -9,7 +9,10 @@ type Retryer struct {
 
 	// Backoff defines a backoff function that returns `time.Duration`
 	// This is applied on subsequent attempts.
-	Backoff func() time.Duration
+	Backoff func(n uint, delay time.Duration) time.Duration
+
+	// Delay defines duration to delay
+	Delay time.Duration
 }
 
 // Do executes `fn` and returns success if `fn` executed succesfully and any errors that occurred
@@ -30,7 +33,7 @@ func (retryer Retryer) Do(fn func() error) (bool, Errors) {
 	for n < retryer.Attempts {
 		// Backoff after first attempt only
 		if n > 0 {
-			time.Sleep(retryer.Backoff())
+			time.Sleep(retryer.Backoff(n, retryer.Delay))
 		}
 
 		err := fn()
