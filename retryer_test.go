@@ -9,9 +9,7 @@ import (
 )
 
 func TestRetry_Do_Success(t *testing.T) {
-	retryer := retry.Retryer{
-		Backoff: retry.ConstantBackoff,
-	}
+	retryer := retry.Retryer{}
 	ok, err := retryer.Do(func() error {
 		return nil
 	})
@@ -24,7 +22,8 @@ func TestRetry_Do_Success(t *testing.T) {
 func TestRetry_Do_FailWithErrors(t *testing.T) {
 	retryer := retry.Retryer{
 		Attempts: 2,
-		Backoff:  retry.NoBackoff,
+		Backoff:  retry.ConstantBackoff,
+		Jitter:   retry.Jitter,
 	}
 	ok, err := retryer.Do(func() error {
 		return errors.New("something bad happened")

@@ -19,12 +19,26 @@ func ExponentialBackoff(n uint, delay time.Duration) time.Duration
 ```
 ExponentialBackoff defines exponential backoff strategy
 
+#### func  Jitter
+
+```go
+func Jitter(backoff time.Duration) time.Duration
+```
+Jitter defines a full jitter strategy
+
 #### func  NoBackoff
 
 ```go
 func NoBackoff(_ uint, _ time.Duration) time.Duration
 ```
 NoBackoff defines no backoff strategy
+
+#### func  NoJitter
+
+```go
+func NoJitter(backoff time.Duration) time.Duration
+```
+NoJitter defines no jitter strategy
 
 #### type Errors
 
@@ -44,14 +58,21 @@ func (errs Errors) Error() string
 
 ```go
 type Retryer struct {
-	// Attempts defines the number of retry attempts
+	// Attempts defines the number of retry attempts.
+	// Default 1.
 	Attempts uint
 
-	// Backoff defines a backoff function that returns `time.Duration`
+	// Backoff defines a backoff function that returns `time.Duration`.
 	// This is applied on subsequent attempts.
+	// Default no backoff.
 	Backoff func(n uint, delay time.Duration) time.Duration
 
-	// Delay defines duration to delay
+	// Jitter defines a jitter function that returns `time.Duration`.
+	// Default no jitter.
+	Jitter func(backoff time.Duration) time.Duration
+
+	// Delay defines duration to delay.
+	// Default 0.
 	Delay time.Duration
 }
 ```

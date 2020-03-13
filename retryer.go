@@ -1,17 +1,32 @@
 package retry
 
-import "time"
+import (
+	"time"
+)
+
+var (
+	defaultAttempts = uint(1)
+	defaultBackoff  = NoBackoff
+	defaultJitter   = NoJitter
+)
 
 // Retryer defines a retryer
 type Retryer struct {
-	// Attempts defines the number of retry attempts
+	// Attempts defines the number of retry attempts.
+	// Default 1.
 	Attempts uint
 
-	// Backoff defines a backoff function that returns `time.Duration`
+	// Backoff defines a backoff function that returns `time.Duration`.
 	// This is applied on subsequent attempts.
+	// Default no backoff.
 	Backoff func(n uint, delay time.Duration) time.Duration
 
-	// Delay defines duration to delay
+	// Jitter defines a jitter function that returns `time.Duration`.
+	// Default no jitter.
+	Jitter func(backoff time.Duration) time.Duration
+
+	// Delay defines duration to delay.
+	// Default 0.
 	Delay time.Duration
 }
 
@@ -23,17 +38,21 @@ func (retryer Retryer) Do(fn func() error) (bool, Errors) {
 	)
 
 	if retryer.Attempts < 1 {
-		retryer.Attempts = 1
+		retryer.Attempts = defaultAttempts
 	}
 
 	if retryer.Backoff == nil {
-		retryer.Backoff = NoBackoff
+		retryer.Backoff = defaultBackoff
+	}
+
+	if retryer.Jitter == nil {
+		retryer.Jitter = defaultJitter
 	}
 
 	for n < retryer.Attempts {
-		// Backoff after first attempt only
+		// Backoff and jitter after first attempt only
 		if n > 0 {
-			time.Sleep(retryer.Backoff(n, retryer.Delay))
+			time.Sleep(retryer.Jitter(retryer.Backoff(n, retryer.Delay)))
 		}
 
 		err := fn()
